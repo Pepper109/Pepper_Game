@@ -24,8 +24,13 @@ Noita-wands esque movement (maybe it moves towards the closest beam node, then y
 (maybe beam nodes have some total charge that gets used as they pull you to them)
 
 Spell Ideas: 
+
 Stop at a particular tile
+
 Move towards closest beam node
+
 Move towards second closest beam node
+
 Modifiers for duration (doubles duration, or adds +5 seconds or something)
+
 Change tile into different tile (idk targeting)
