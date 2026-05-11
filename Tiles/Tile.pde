@@ -8,6 +8,7 @@ class Tile{
   //start with fog of war, able to place down drills to harvest remotely and come back to collect (but anyone can steal from them)
   //able to place radars
   boolean alive, aliveNext;
+  HashMap<Ship, Integer> visibility = new HashMap();
 
 Tile(float tileSize, int gridX, int gridY, int tileType){
 this.tileSize= tileSize;
@@ -44,19 +45,53 @@ void updateAlive(){
 
 
 void display(){
-    if (tileType == 0){
-        image(energy, gridX*tileSize, gridY*tileSize, tileSize, tileSize);
+    Ship s = getPlayerShip();
+    boolean displayed = false;
+    if (visibility.get(s) == 2){
+        if (tileType == 0){
+            image(energy, gridX*tileSize, gridY*tileSize, tileSize, tileSize);
+        }
+        if (tileType == 1){
+            image(ice, gridX*tileSize, gridY*tileSize, tileSize, tileSize);
+        }
+        if (tileType == 2){
+            image(rock, gridX*tileSize, gridY*tileSize, tileSize, tileSize);
+        }
+        displayed = true;
+        //rect(gridX*tileSize, gridY*tileSize, tileSize, tileSize);
     }
-    if (tileType == 1){
-        image(ice, gridX*tileSize, gridY*tileSize, tileSize, tileSize);
+    if (visibility.get(s) == 1){
+        stroke(0);
+        fill(100,100,100);
+        rect(gridX*tileSize, gridY*tileSize, tileSize, tileSize);
+        displayed = true;
     }
-    if (tileType == 2){
-        image(rock, gridX*tileSize, gridY*tileSize, tileSize, tileSize);
+    if (displayed == false){
+        stroke(0);
+        fill(0);
+        rect(gridX*tileSize, gridY*tileSize, tileSize, tileSize);
     }
-    //rect(gridX*tileSize, gridY*tileSize, tileSize, tileSize);
+
 }
 
-
-
+void updateVisibility(){
+    for (Ship s : ships){
+        if (visibility.containsKey(s) == false){
+            visibility.put(s, 0);
+        }
+        if (getTaxiDistance(getTile(s.posX, s.posY).gridX, getTile(s.posX, s.posY).gridY, gridX, gridY) < s.visibilityRange){
+            visibility.put(s, 2);
+        }
+        else {
+            if (visibility.get(s) > 0){
+                visibility.put(s, 1);
+            }
+            else {
+                visibility.put(s, 0);
+            }
+        }
+    }
+}
+//Update visibility first when introducing new ship!! since this adds ships to the list.
 
 }

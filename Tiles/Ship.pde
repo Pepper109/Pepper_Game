@@ -7,8 +7,8 @@
 //ignore run time of the next instruction
 class Ship{
     float posX, posY, maxhitpoints, hitpoints, velocity, maxVelocity, acceleration;
-    int gridX, gridY, destGridX, destGridY, ammo1Count, energyCount, waterCount, metalCount;
-    boolean harvesting;
+    int gridX, gridY, destGridX, destGridY, ammo1Count, energyCount, waterCount, metalCount, visibilityRange;
+    boolean harvesting, isPlayer;
     Ship(float posX, float posY){
         this.posX = posX;
         this.posY=posY;
@@ -17,6 +17,8 @@ class Ship{
         this.velocity = 0;
         this.maxVelocity = 5;
         this.acceleration = 0.1;
+        this.visibilityRange = 7;
+        this.isPlayer = true;
     }
 
     void display(){

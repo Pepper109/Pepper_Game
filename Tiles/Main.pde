@@ -39,6 +39,7 @@ void setup() {
   energy = loadImage("lightning1.png");
   ice = loadImage("ice1.png");
   rock = loadImage("rock1.png");
+  print("done setup");
   
 }
 
@@ -54,6 +55,7 @@ void draw() {
   if (frameCount % updateInterval == 0 && simStart == true){
     c.alive = c.aliveNext;
   }
+  c.updateVisibility();
   c.display();
   }
 
@@ -86,7 +88,7 @@ int getKey(int n, int m){
 }
 
 Tile getTile(float x, float y){
-    print ((int)floor(x/tileSize));
+    //print ((int)floor(x/tileSize));
     return tiles.get(getKey((int)floor(x/tileSize), (int)floor(y/tileSize)));
 }
 
@@ -118,3 +120,17 @@ int generateTileType(HashMap<Integer, Float> tileDistribution){
   return ret;
 }
  //randomizes tiles according to a given distribution that adds up to 1
+
+int getTaxiDistance(int x1, int y1, int x2, int y2){
+  return Math.abs(x1-x2)+Math.abs(y1-y2);
+}
+
+Ship getPlayerShip(){
+  for (Ship s : ships){
+    if (s.isPlayer == true){
+      return s;
+    }
+  }
+  print("ship not found");
+  return null;
+}
