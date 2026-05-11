@@ -21,6 +21,7 @@ class Ship{
 
     void display(){
         stroke(255, 255, 0);
+        fill(0);
         circle(posX, posY, 20);
     }
 
