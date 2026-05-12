@@ -15,7 +15,7 @@ class Ship{
         this.maxhitpoints = 100;
         this.hitpoints =70;
         this.velocity = 0;
-        this.maxVelocity = 5;
+        this.maxVelocity = 2;
         this.acceleration = 0.1;
         this.visibilityRange = 7;
         this.isPlayer = true;
