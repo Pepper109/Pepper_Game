@@ -1,5 +1,5 @@
 class Tile{
-  float tileSize, posX, posY;
+  float tileSize, posX, posY, lifespan;
   int gridX, gridY, neighbourCount, id, tileType;
   //gas asteroids (fuel), rock/metal asteroids (ammunition, repairs), abandoned fuel cells (energy for leaving the stage)
   //planets have genetic material (currency - in the entire universe, diamond is more common than wood idea)
@@ -94,4 +94,12 @@ void updateVisibility(){
 }
 //Update visibility first when introducing new ship!! since this adds ships to the list.
 
+}
+
+
+public class Beam extends Tile{
+    Beam(float tileSize, int gridX, int gridY, int tileType, float lifespan){
+        super(tileSize, gridX, gridY, tileType);
+        this.lifespan = lifespan;
+    }
 }

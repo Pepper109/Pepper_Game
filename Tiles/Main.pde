@@ -134,3 +134,39 @@ Ship getPlayerShip(){
   print("ship not found");
   return null;
 }
+
+// float angleBetween(float x1, float y1, float x2, float y2) {
+
+//     float dot = x1 * x2 + y1 * y2;
+//     float det = x1 * y2 - y1 * x2;
+
+//     float angle = (float)Math.atan2(det, dot); // (-pi, pi]
+
+//     if (angle < 0) {
+//         angle += 2.0f * (float)Math.PI;
+//     }
+
+//     return angle; // [0, 2pi)
+// }
+
+// float angleVector(float x, float y){
+//   return angleBetweeen(x,y,1,0);
+// }
+
+// float[] rotate(float x, float y, float theta) {
+//     float cos = (float)Math.cos(theta);
+//     float sin = (float)Math.sin(theta);
+
+//     float xr = x * cos - y * sin;
+//     float yr = x * sin + y * cos;
+
+//     return new float[]{xr, yr};
+// }
+
+// float norm(float x, float y) {
+//     return (float)Math.sqrt(x * x + y * y);
+// }
+
+// float distance(float x1, float y1, float x2, float y2){
+//   return norm(x1-x2, y1-y2);
+// }
