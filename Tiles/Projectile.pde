@@ -16,7 +16,7 @@ class Projectile{
         this.velocity = velocity;
         this.maxVelocity = maxVelocity;
         this.acceleration = acceleration;
-        this.homingRange = homingRange
+        this.homingRange = homingRange;
         this.alive = true;
     }
 
@@ -24,6 +24,9 @@ class Projectile{
         if (PVector.dist(position, target) > 0.00001){
            if(velocity.mag() < maxVelocity){
                 velocity.add(velocity.copy().normalize().mult(acceleration));
+            // if ((velocity.mag() < 0.001)){
+            //     velocity.add(target.copy().sub(position).normalize().mult(acceleration));
+            // }
                 velocity.limit(maxVelocity);
             }
             float diffAngle = PVector.angleBetween(target.copy().sub(position), velocity);

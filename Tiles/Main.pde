@@ -4,6 +4,7 @@ import java.util.HashMap;
 HashSet<Integer> aliveCond = new HashSet<>();
 HashSet<Integer> birthCond = new HashSet<>();
 HashSet<Ship> ships = new HashSet<>();
+HashSet<Projectile> projectiles = new HashSet<>();
 HashMap<Integer, Float> tileDistribution = new HashMap<>();
 HashMap<Integer, Tile> tiles = new HashMap<>();
 boolean simStart = true;
@@ -24,7 +25,7 @@ void setup() {
   aliveCond.add(444);
   birthCond.add(3);
 
-  ships.add(new Ship(200, 200));
+  ships.add(new Ship(new PVector(200,200)));
   
   for (int i = 0; i < numTileType; i++){
     tileDistribution.put(i, (float) 1/numTileType);
@@ -62,7 +63,7 @@ void draw() {
   for (Ship s : ships){
     s.display();
     s.hp_display();
-    s.moveTO(mouseX,mouseY);
+    s.moveTO(new PVector(mouseX, mouseY));
   }
 
   textFont(font,16);                  // STEP 3 Specify font to be used
@@ -75,7 +76,7 @@ void draw() {
 void mousePressed() {
   print("pressed!");
   print(tileSize);
-  Tile c = getTile(mouseX, mouseY);
+  Tile c = getTile(new PVector(mouseX, mouseY));
   if (c!= null){
   c.alive = !c.alive;
   print("alived!");
@@ -87,9 +88,9 @@ int getKey(int n, int m){
     return (m+n)*(m+n+1)/2+m;
 }
 
-Tile getTile(float x, float y){
+Tile getTile(PVector pos){
     //print ((int)floor(x/tileSize));
-    return tiles.get(getKey((int)floor(x/tileSize), (int)floor(y/tileSize)));
+    return tiles.get(getKey((int)floor(pos.x/tileSize), (int)floor(pos.y/tileSize)));
 }
 
 boolean sTriggered = false;

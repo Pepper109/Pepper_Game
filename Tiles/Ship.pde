@@ -6,17 +6,17 @@
 //subroutines would have run times, and maybe modifiers like in noita can be found? e.g. complete next two actions simultaneously, or 
 //ignore run time of the next instruction
 class Ship{
-    float posX, posY, maxhitpoints, hitpoints, velocity, maxVelocity, acceleration;
+    float maxhitpoints, hitpoints, maxVelocity, acceleration;
     int gridX, gridY, destGridX, destGridY, ammo1Count, energyCount, waterCount, metalCount, visibilityRange;
     boolean harvesting, isPlayer;
-    Ship(float posX, float posY){
-        this.posX = posX;
-        this.posY=posY;
+    PVector position, velocity;
+    Ship(PVector position){
+        this.position = position;
         this.maxhitpoints = 100;
         this.hitpoints =70;
-        this.velocity = 0;
+        this.velocity = new PVector(0,0);
         this.maxVelocity = 2;
-        this.acceleration = 0.1;
+        this.acceleration = 0.05;
         this.visibilityRange = 7;
         this.isPlayer = true;
     }
@@ -24,32 +24,47 @@ class Ship{
     void display(){
         stroke(255, 255, 0);
         fill(0);
-        circle(posX, posY, 20);
+        circle(position.x, position.y, 20);
     }
 
     void hp_display(){
         fill(0,0,0);
-        rect(posX-15, posY+25, 30, 5);
+        rect(position.x-15, position.y+25, 30, 5);
         fill(255,0,0);
-        rect(posX-15, posY+25, 30*hitpoints/maxhitpoints, 5);
+        rect(position.x-15, position.y+25, 30*hitpoints/maxhitpoints, 5);
     }
 
-    void moveTO(float targetX, float targetY){
-        if (posX != targetX || posY != targetY){
-           if(velocity < maxVelocity){
-                velocity = min(velocity+acceleration, maxVelocity);
+    void moveTO(PVector target){
+        if (PVector.dist(position, target) > 0.00001){
+                float directionalSpeed = velocity.dot(target.copy().sub(position).normalize());
+                float speed = directionalSpeed+acceleration;
+                velocity.set(target.copy().sub(position).normalize().mult(speed));
+                velocity.limit(maxVelocity);
             }
-            float diffX = targetX-posX;
-            float diffY = targetY-posY;
-            posX += velocity*diffX/(sqrt(diffX*diffX+diffY*diffY));
-            posY += velocity*diffY/(sqrt(diffX*diffX+diffY*diffY));
-            if (diffX*diffX+diffY*diffY < velocity*velocity){
-                posX = targetX;
-                posY = targetY;
-                velocity = 0;
+            position.add(velocity);
+            if (PVector.dist(position, target) < velocity.mag()){
+                position.set(target);
+                velocity.mult(0);
             }
         }
-    }
+    
+
+    // void moveTO(float targetX, float targetY){
+    //     if (posX != targetX || posY != targetY){
+    //        if(velocity < maxVelocity){
+    //             velocity = min(velocity+acceleration, maxVelocity);
+    //         }
+    //         float diffX = targetX-posX;
+    //         float diffY = targetY-posY;
+    //         posX += velocity*diffX/(sqrt(diffX*diffX+diffY*diffY));
+    //         posY += velocity*diffY/(sqrt(diffX*diffX+diffY*diffY));
+    //         if (diffX*diffX+diffY*diffY < velocity*velocity){
+    //             posX = targetX;
+    //             posY = targetY;
+    //             velocity = 0;
+    //         }
+    //     }
+    // }
 
     
 

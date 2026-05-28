@@ -79,7 +79,7 @@ void updateVisibility(){
         if (visibility.containsKey(s) == false){
             visibility.put(s, 0);
         }
-        if (getTaxiDistance(getTile(s.posX, s.posY).gridX, getTile(s.posX, s.posY).gridY, gridX, gridY) < s.visibilityRange){
+        if (getTaxiDistance(getTile(s.position).gridX, getTile(s.position).gridY, gridX, gridY) < s.visibilityRange){
             visibility.put(s, 2);
         }
         else {
