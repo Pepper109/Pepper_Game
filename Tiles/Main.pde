@@ -5,13 +5,19 @@ HashSet<Integer> aliveCond = new HashSet<>();
 HashSet<Integer> birthCond = new HashSet<>();
 HashSet<Ship> ships = new HashSet<>();
 HashSet<Projectile> projectiles = new HashSet<>();
+HashSet<Projectile> projectilesToRemove = new HashSet<>();
+HashSet<Player> players = new HashSet<>();
 HashMap<Integer, Float> tileDistribution = new HashMap<>();
 HashMap<Integer, Tile> tiles = new HashMap<>();
 boolean simStart = true;
-PImage energy, ice, rock;
-int tileYCount, tileXCount, frameCount = 0, updateInterval = 20, numTileType = 3;
+PImage energy, ice, rock, beam, mining, missile;
+int tileYCount, tileXCount, frameCount = 0, updateInterval = 20, numTileType = 4;
 float tileSize;
 PFont font;                           // STEP 1 Declare PFont variable
+Ship playerShip = new Ship(new PVector(200,200));
+Player player1 = new Player();
+int mineEnergyCost = 200;
+int mineMetalCost = 400;
 
 void setup() {
   size(1200, 800);
@@ -24,12 +30,14 @@ void setup() {
   aliveCond.add(3);
   aliveCond.add(444);
   birthCond.add(3);
-
-  ships.add(new Ship(new PVector(200,200)));
+  ships.add(playerShip);
+  players.add(player1);
+  projectiles.add(new Projectile(new PVector(200,200), new PVector(400,400), 0.1, new PVector(4,0), 5, 0.1, 280, 1000));
   
-  for (int i = 0; i < numTileType; i++){
-    tileDistribution.put(i, (float) 1/numTileType);
-  }
+  tileDistribution.put(0, 0.3);
+  tileDistribution.put(1, 0.3);
+  tileDistribution.put(2, 0.3);
+  tileDistribution.put(3, 0.1);
 
 
   for (int i = 0; i < tileXCount; i++) {
@@ -40,6 +48,9 @@ void setup() {
   energy = loadImage("lightning1.png");
   ice = loadImage("ice1.png");
   rock = loadImage("rock1.png");
+  beam = loadImage("teleport1.png");
+  mining = loadImage("mining1.png");
+  missile = loadImage("missile.png");
   print("done setup");
   
 }
@@ -58,6 +69,22 @@ void draw() {
   }
   c.updateVisibility();
   c.display();
+  if (c.modifier == 1){
+    if (c.tileType == 0){
+        player1.energy += 1;
+    }
+    if (c.tileType == 1){
+        player1.water += 1;
+    }
+    if (c.tileType == 2){
+        player1.metal += 1;
+    }
+  }
+}
+  for (Player p : players){
+    if (frameCount % 10 == 0){
+      p.energy -= (int) playerShip.velocity.copy().mag();
+    }
   }
 
   for (Ship s : ships){
@@ -65,10 +92,28 @@ void draw() {
     s.hp_display();
     s.moveTO(new PVector(mouseX, mouseY));
   }
+  for (Projectile p : projectiles){
+    p.display();
+    p.moveTO(p.target);
+    p.lifetime -= 1;
+    if (p.lifetime <= 0){
+      p.alive = false;
+    }
+    if (p.position == p.target){
+      p.alive = false;
+    }
+    if (p.alive == false){
+      projectilesToRemove.add(p);
+    }
+  }
+  projectiles.removeAll(projectilesToRemove);
+  projectilesToRemove.clear();
 
   textFont(font,16);                  // STEP 3 Specify font to be used
-  fill(255);                         // STEP 4 Specify font color
-  text("Hello Strings!",10,100);   // STEP 5 Display Text
+  fill(10,255,255);                         // STEP 4 Specify font color
+  text("Water: " + player1.water,10,100);   // STEP 5 Display Text
+  text("Energy: " + player1.energy,10,80);
+  text("Metal: " + player1.metal,10,60);
 
 
 }
@@ -76,11 +121,8 @@ void draw() {
 void mousePressed() {
   print("pressed!");
   print(tileSize);
-  Tile c = getTile(new PVector(mouseX, mouseY));
-  if (c!= null){
-  c.alive = !c.alive;
-  print("alived!");
-  }
+  //Tile c = getTile(new PVector(mouseX, mouseY));
+  //c.modifier = 1;
 }
 
 
@@ -94,10 +136,30 @@ Tile getTile(PVector pos){
 }
 
 boolean sTriggered = false;
+boolean spaceTriggered = false;
+boolean cTriggered = false;
 void keyPressed(){
     if (key == 's' && sTriggered == false){
         simStart = !simStart;
         sTriggered = true;
+        print("simulation started");
+    }
+    if (key == ' ' && spaceTriggered == false){
+      print("projectile created");
+        projectiles.add(new Projectile(playerShip.position.copy(), new PVector(400,400), 0.1, playerShip.velocity.copy().mult(0.33), 5, 0.1, 280, 1000));
+        spaceTriggered = true;
+        print("projectile created");
+    }
+    if (key == 'c' && cTriggered == false){
+      Tile c = getTile(playerShip.position);
+      if (player1.energy >= mineEnergyCost && player1.metal >= mineMetalCost && c.modifier != 1){
+        c.modifier = 1;
+        player1.energy -= mineEnergyCost;
+        player1.metal -= mineMetalCost;
+        mineEnergyCost = (int) (mineEnergyCost*1.25);
+        mineMetalCost = (int)(mineMetalCost*1.25);
+        cTriggered = true;
+      }
     }
 }
 
@@ -105,7 +167,17 @@ void keyReleased() {
     if (key == 's'){
       sTriggered = false;
     }
+    if (key == ' '){
+      spaceTriggered = false;
+    }
+    if (key == 'c'){
+      cTriggered = false;
+    }
 }
+
+
+
+
 
 
 int generateTileType(HashMap<Integer, Float> tileDistribution){
@@ -134,6 +206,12 @@ Ship getPlayerShip(){
   }
   print("ship not found");
   return null;
+}
+
+float angleBetween(PVector v1, PVector v2) {
+  float a = atan2(v2.y, v2.x) - atan2(v1.y, v1.x);
+  if (a < 0) a += TWO_PI;
+  return a;
 }
 
 // float angleBetween(float x1, float y1, float x2, float y2) {

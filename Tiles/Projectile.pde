@@ -1,5 +1,5 @@
 class Projectile{
-    float  maxVelocity, homingRate, acceleration, homingRange;
+    float  maxVelocity, homingRate, acceleration, homingRange, lifetime;
     int type;
     boolean alive;
     PVector position, velocity, target;
@@ -9,7 +9,7 @@ class Projectile{
     //nukes cost uranium-235, are slow but explode 4 hex aoe destroying all tiles present
 
     Projectile(PVector position, PVector target, float homingRate, PVector velocity,
-     float maxVelocity, float acceleration, float homingRange){
+     float maxVelocity, float acceleration, float homingRange, float lifetime){
         this.position = position;
         this.target = target;
         this.homingRate = homingRate;
@@ -18,6 +18,12 @@ class Projectile{
         this.acceleration = acceleration;
         this.homingRange = homingRange;
         this.alive = true;
+        this.lifetime = lifetime;
+    }
+
+    void display(){
+        rotate(atan2(velocity.y, velocity.x));
+        image(missile, position.x, position.y, 20, 80);
     }
 
     void moveTO(PVector target){
@@ -31,9 +37,15 @@ class Projectile{
             }
                 velocity.limit(maxVelocity);
             }
-            float diffAngle = PVector.angleBetween(target.copy().sub(position), velocity);
-            float rotateRate = diffAngle*homingRate*homingRange*homingRange/(1+PVector.dist(position, target)*PVector.dist(position, target));
-            velocity.rotate(rotateRate);
+            float diffAngle = angleBetween(target.copy().sub(position), velocity);
+            if (diffAngle > PI){
+                diffAngle = diffAngle-2*PI;
+            }
+            float rotateRate = (maxVelocity*2-velocity.mag())/maxVelocity*diffAngle*homingRate*homingRange*(float) Math.sqrt(homingRange)/(1+PVector.dist(position, target)*PVector.dist(position, target));
+            if (abs(rotateRate) > abs(diffAngle)){
+                rotateRate = diffAngle;
+            }
+            velocity.rotate(-rotateRate);
             position.add(velocity);
             if (PVector.dist(position, target) < velocity.mag()){
                 position.set(target);
