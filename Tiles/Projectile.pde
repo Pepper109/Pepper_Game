@@ -3,13 +3,14 @@ class Projectile{
     int type;
     boolean alive;
     PVector position, velocity, target;
+    Ship shipTarget;
     //craft and launch different projectiles that consume different resources
     //rockets cost more gases, has homing
     //railgun ammunition costs more metals, has instant travel time, pierces shields
     //nukes cost uranium-235, are slow but explode 4 hex aoe destroying all tiles present
 
     Projectile(PVector position, PVector target, float homingRate, PVector velocity,
-     float maxVelocity, float acceleration, float homingRange, float lifetime){
+     float maxVelocity, float acceleration, float homingRange, float lifetime, Ship shipTarget){
         this.position = position;
         this.target = target;
         this.homingRate = homingRate;
@@ -19,11 +20,17 @@ class Projectile{
         this.homingRange = homingRange;
         this.alive = true;
         this.lifetime = lifetime;
+        this.shipTarget = shipTarget;
     }
 
     void display(){
-        rotate(atan2(velocity.y, velocity.x));
-        image(missile, position.x, position.y, 20, 80);
+        pushMatrix();
+        imageMode(CENTER);
+        translate(position.x, position.y);
+        rotate(PI/2+atan2(velocity.y, velocity.x));
+        image(missile, 0, 0, 20, 80);
+        popMatrix();
+        imageMode(CORNER);
     }
 
     void moveTO(PVector target){
@@ -53,6 +60,10 @@ class Projectile{
                 alive = false;
             }
         }
+    }
+
+    void targetShip(Ship ship){
+        moveTO(ship.position.copy());
     }
 
 }

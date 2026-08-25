@@ -46,7 +46,7 @@ void updateAlive(){
 
 
 void display(){
-    Ship s = getPlayerShip();
+    Ship s = getPlayer1Ship();
     boolean displayed = false;
     if (visibility.get(s) == 2){
         if (tileType == 0){

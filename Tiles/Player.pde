@@ -1,8 +1,10 @@
 class Player{
     int water, energy, metal;
-    Player(){
-        this.water = 500;
-        this.energy = 500;
-        this.metal = 500;
+    Ship ship;
+    Player(Ship ship){
+        this.water = 1000;
+        this.energy = 1000;
+        this.metal = 1000;
+        this.ship = ship;
     }
 }
