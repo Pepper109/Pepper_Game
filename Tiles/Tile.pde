@@ -1,5 +1,5 @@
 class Tile{
-  float tileSize, posX, posY, lifespan;
+  float tileSize, posX, posY, lifespan, modifier;
   int gridX, gridY, neighbourCount, id, tileType;
   //gas asteroids (fuel), rock/metal asteroids (ammunition, repairs), abandoned fuel cells (energy for leaving the stage)
   //planets have genetic material (currency - in the entire universe, diamond is more common than wood idea)
@@ -17,6 +17,7 @@ this.tileType = tileType;
 this.gridY = gridY;
 this.alive  = false;
 this.id = (gridX+gridY)*(gridX+gridY+1)/2 + gridY;
+this.modifier = 0;
 }
 
 int getAliveNeighboursCount(){
@@ -45,7 +46,7 @@ void updateAlive(){
 
 
 void display(){
-    Ship s = getPlayerShip();
+    Ship s = getPlayer1Ship();
     boolean displayed = false;
     if (visibility.get(s) == 2){
         if (tileType == 0){
@@ -56,6 +57,12 @@ void display(){
         }
         if (tileType == 2){
             image(rock, gridX*tileSize, gridY*tileSize, tileSize, tileSize);
+        }
+        if (tileType == 3){
+            image(beam, gridX*tileSize, gridY*tileSize, tileSize, tileSize);
+        }
+        if (modifier == 1){
+            image(mining, gridX*tileSize, gridY*tileSize, tileSize, tileSize);
         }
         displayed = true;
         //rect(gridX*tileSize, gridY*tileSize, tileSize, tileSize);
