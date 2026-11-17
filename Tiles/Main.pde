@@ -40,7 +40,6 @@ void setup() {
   players.add(player1);
   ships.add(player2Ship);
   players.add(player2);
-  projectiles.add(new Projectile(new PVector(200,200), new PVector(400,400), 0.1, new PVector(4,0), 5, 0.1, 280, 1000, player1Ship));
   
   tileDistribution.put(0, 0.3);
   tileDistribution.put(1, 0.3);
@@ -94,13 +93,14 @@ void draw() {
   for (Player p : players){
     if (frameCount % 10 == 0){
       p.energy -= (int) p.ship.velocity.copy().mag();
+      p.updateShipSpeed();
       p.water -= 2;
       if (p.ship.hitpoints < p.ship.maxhitpoints && p.water > 10){
         p.ship.hitpoints += 1;
         p.water -= 10;
       }
     }
-    p.ship.moveTO(targetLocation);
+    p.ship.moveTO(p.ship.targetLocation);
   }
 
   for (Ship s : ships){
@@ -160,6 +160,11 @@ boolean wTriggered = false;
 boolean aTriggered = false;
 boolean sTriggered = false;
 boolean dTriggered = false;
+boolean upTriggered = false;
+boolean leftTriggered = false;
+boolean downTriggered = false;
+boolean rightTriggered = false;
+
 void keyPressed(){
     if (key == ' ' && spaceTriggered == false){
       print("projectile created");
@@ -180,20 +185,38 @@ void keyPressed(){
     }
     
     if (key == 'w' && wTriggered == false){
-      targetLocation.add(new PVector(0, -10000));
+      player1Ship.targetLocation.add(new PVector(0, -10000));
       wTriggered = true;
     }
     if (key == 'a' && aTriggered == false){
-      targetLocation.add(new PVector(-10000, 0));
+      player1Ship.targetLocation.add(new PVector(-10000, 0));
       aTriggered = true;
     }
     if (key == 's' && sTriggered == false){
-      targetLocation.add(new PVector(0, 10000));
+      player1Ship.targetLocation.add(new PVector(0, 10000));
       sTriggered = true;
     }
     if (key == 'd' && dTriggered == false){
-      targetLocation.add(new PVector(10000, 0));
+      player1Ship.targetLocation.add(new PVector(10000, 0));
       dTriggered = true;
+    }
+
+
+    if (keyCode == UP && upTriggered == false){
+      player2Ship.targetLocation.add(new PVector(0, -10000));
+      upTriggered = true;
+    }
+    if (keyCode == LEFT && leftTriggered == false){
+      player2Ship.targetLocation.add(new PVector(-10000, 0));
+      leftTriggered = true;
+    }
+    if (keyCode == DOWN && downTriggered == false){
+      player2Ship.targetLocation.add(new PVector(0, 10000));
+      downTriggered = true;
+    }
+    if (keyCode == RIGHT && rightTriggered == false){
+      player2Ship.targetLocation.add(new PVector(10000, 0));
+      rightTriggered = true;
     }
 }
 
@@ -206,22 +229,43 @@ void keyReleased() {
     }
     if (key == 'w'){
       wTriggered = false;
-      targetLocation.sub(new PVector(0, -10000));
+      player1Ship.targetLocation.sub(new PVector(0, -10000));
     }
     if (key == 'a'){
       aTriggered = false;
-      targetLocation.sub(new PVector(-10000, 0));
+      player1Ship.targetLocation.sub(new PVector(-10000, 0));
     }
     if (key == 's'){
       sTriggered = false;
-      targetLocation.sub(new PVector(0, 10000));
+      player1Ship.targetLocation.sub(new PVector(0, 10000));
     }
     if (key == 'd'){
       dTriggered = false;
-      targetLocation.sub(new PVector(10000, 0));
+      player1Ship.targetLocation.sub(new PVector(10000, 0));
     }
     if (wTriggered == false && aTriggered == false && sTriggered == false && dTriggered == false){
-      targetLocation = player1Ship.position.copy().add(player1Ship.velocity.copy());
+      player1Ship.targetLocation = player1Ship.position.copy().add(player1Ship.velocity.copy());
+    }
+
+
+    if (keyCode == UP){
+      upTriggered = false;
+      player2Ship.targetLocation.sub(new PVector(0, -10000));
+    }
+    if (keyCode == LEFT){
+      leftTriggered = false;
+      player2Ship.targetLocation.sub(new PVector(-10000, 0));
+    }
+    if (keyCode == DOWN){
+      downTriggered = false;
+      player2Ship.targetLocation.sub(new PVector(0, 10000));
+    }
+    if (keyCode == RIGHT){
+      rightTriggered = false;
+      player2Ship.targetLocation.sub(new PVector(10000, 0));
+    }
+    if (upTriggered == false && leftTriggered == false && downTriggered == false && rightTriggered == false){
+      player2Ship.targetLocation = player2Ship.position.copy().add(player2Ship.velocity.copy());
     }
 }
 
@@ -249,13 +293,7 @@ int getTaxiDistance(int x1, int y1, int x2, int y2){
 }
 
 Ship getPlayer1Ship(){
-  for (Ship s : ships){
-    if (s.isPlayer == 1){
-      return s;
-    }
-  }
-  print("ship not found");
-  return null;
+  return player1Ship;
 }
 
 float angleBetween(PVector v1, PVector v2) {

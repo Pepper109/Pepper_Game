@@ -7,4 +7,9 @@ class Player{
         this.metal = 1000;
         this.ship = ship;
     }
+
+    void updateShipSpeed(){
+        ship.maxVelocity = ship.initialMaxVelocity * energy/1000;
+        ship.acceleration = ship.initialAcceleration * energy/1000;
+    }
 }

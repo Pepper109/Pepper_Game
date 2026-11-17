@@ -56,6 +56,7 @@ class Projectile{
             position.add(velocity);
             if (PVector.dist(position, target) < velocity.mag()){
                 position.set(target);
+                shipTarget.hitpoints -= 35;
                 velocity.mult(0);
                 alive = false;
             }

@@ -6,19 +6,22 @@
 //subroutines would have run times, and maybe modifiers like in noita can be found? e.g. complete next two actions simultaneously, or 
 //ignore run time of the next instruction
 class Ship{
-    float maxhitpoints, hitpoints, maxVelocity, acceleration;
+    float maxhitpoints, hitpoints, maxVelocity, acceleration, initialMaxVelocity, initialAcceleration;
     int gridX, gridY, destGridX, destGridY, ammo1Count, energyCount, waterCount, metalCount, visibilityRange, isPlayer;
     boolean harvesting;
-    PVector position, velocity;
+    PVector position, velocity, targetLocation;
     Ship(PVector position){
         this.position = position;
         this.maxhitpoints = 100;
         this.hitpoints =70;
         this.velocity = new PVector(0,0);
+        this.initialMaxVelocity = 2;
         this.maxVelocity = 2;
+        this.initialAcceleration = 0.05;
         this.acceleration = 0.05;
         this.visibilityRange = 7;
         this.isPlayer = 1;
+        this.targetLocation = position.copy();
     }
 
     void display(){
@@ -36,7 +39,7 @@ class Ship{
 
     void moveTO(PVector target){
         if (PVector.dist(position, target) > 0.00001){
-                float directionalSpeed = velocity.dot(target.copy().sub(position).normalize());
+                float directionalSpeed = Math.max(velocity.dot(target.copy().sub(position).normalize()), 0);
                 float speed = directionalSpeed+acceleration;
                 velocity.set(target.copy().sub(position).normalize().mult(speed));
                 velocity.limit(maxVelocity);
