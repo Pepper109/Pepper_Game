@@ -1,5 +1,7 @@
 import java.util.HashSet;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 HashSet<Integer> aliveCond = new HashSet<>();
 HashSet<Integer> birthCond = new HashSet<>();
@@ -19,9 +21,9 @@ Player player1 = new Player(player1Ship);
 Ship player2Ship = new Ship(new PVector(800,400));
 Player player2 = new Player(player2Ship);
 int mineEnergyCost = 200;
-int mineMetalCost = 300;
-int rocketEnergyCost = 400;
-int rocketMetalCost = 400;
+int mineMetalCost = 200;
+int missileEnergyCost = 300;
+int missileMetalCost = 300;
 PVector targetLocation = player1Ship.position.copy();
 
 void setup() {
@@ -87,6 +89,17 @@ void draw() {
         player1.metal += 1;
     }
   }
+  if (c.modifier == 2){
+    if (c.tileType == 0){
+        player2.energy += 1;
+    }
+    if (c.tileType == 1){
+        player2.water += 1;
+    }
+    if (c.tileType == 2){
+        player2.metal += 1;
+    }
+  }
 }
 
 
@@ -124,13 +137,19 @@ void draw() {
   projectiles.removeAll(projectilesToRemove);
   projectilesToRemove.clear();
 
-  textFont(font,16);                  // STEP 3 Specify font to be used
-  fill(10,255,255);                         // STEP 4 Specify font color
-  text("Water: " + player1.water,10,100);   // STEP 5 Display Text
-  text("Energy: " + player1.energy,10,80);
-  text("Metal: " + player1.metal,10,60);
+  textFont(font,16);                 
+  fill(10,255,255);                         
+  text("Water: " + player1.water,10,120);   
+  text("Energy: " + player1.energy,10,100);
+  text("Metal: " + player1.metal,10,80);
+  text("Mine Cost: "  + mineMetalCost + " Metal, " + mineEnergyCost + " Energy", 10, 40);
+  text("missile Cost: " + missileMetalCost + " Metal, " + missileEnergyCost + " Energy", 10, 20);
+   
+  text("Water: " + player2.water,10,200);   
+  text("Energy: " + player2.energy,10,180);
+  text("Metal: " + player2.metal,10,160);
   text("Mine Cost: " + mineEnergyCost + " Energy, " + mineMetalCost + " Metal", 10, 40);
-  text("Rocket Cost: " + rocketEnergyCost + " Energy, " + rocketMetalCost + " Metal", 10, 20);
+  text("missile Cost: " + missileEnergyCost + " Energy, " + missileMetalCost + " Metal", 10, 20);
 
   circle(400,400, 20);
 
@@ -164,17 +183,22 @@ boolean upTriggered = false;
 boolean leftTriggered = false;
 boolean downTriggered = false;
 boolean rightTriggered = false;
+boolean oneTriggered = false;
+boolean twoTriggered = false;
 
 void keyPressed(){
     if (key == ' ' && spaceTriggered == false){
+      if (player1.energy >= missileEnergyCost && player1.metal >= missileMetalCost){
+      projectiles.add(new Missile(player1Ship.position.copy(), player2Ship.position.copy(), 0.1, player1Ship.velocity.copy().mult(0.33), 5, 0.1, 280, 1000, player2Ship));
+      player1.energy -= missileEnergyCost;
+      player1.metal -= missileMetalCost;
+      spaceTriggered = true;
       print("projectile created");
-        projectiles.add(new Projectile(player1Ship.position.copy(), player2Ship.position.copy(), 0.1, player1Ship.velocity.copy().mult(0.33), 5, 0.1, 280, 1000, player2Ship));
-        spaceTriggered = true;
-        print("projectile created");
+    }
     }
     if (key == 'c' && cTriggered == false){
       Tile c = getTile(player1Ship.position);
-      if (player1.energy >= mineEnergyCost && player1.metal >= mineMetalCost && c.modifier != 1){
+      if (player1.energy >= mineEnergyCost && player1.metal >= mineMetalCost && c.modifier == 0){
         c.modifier = 1;
         player1.energy -= mineEnergyCost;
         player1.metal -= mineMetalCost;
@@ -183,6 +207,29 @@ void keyPressed(){
         cTriggered = true;
       }
     }
+
+    if (key == '1' && oneTriggered == false){
+      if (player2.energy >= missileEnergyCost && player2.metal >= missileMetalCost){
+      projectiles.add(new Missile(player2Ship.position.copy(), player1Ship.position.copy(), 0.1, player2Ship.velocity.copy().mult(0.33), 5, 0.1, 280, 1000, player1Ship));
+      player2.energy -= missileEnergyCost;
+      player2.metal -= missileMetalCost;
+      oneTriggered = true;
+    }
+  }
+
+    if (key == '2' && twoTriggered == false){
+      Tile c = getTile(player2Ship.position);
+      if (player2.energy >= mineEnergyCost && player2.metal >= mineMetalCost && c.modifier == 0){
+        c.modifier = 2;
+        player2.energy -= mineEnergyCost;
+        player2.metal -= mineMetalCost;
+        mineEnergyCost = (int) (mineEnergyCost*1.1);
+        mineMetalCost = (int)(mineMetalCost*1.1);
+      twoTriggered = true;
+    }
+  }
+
+
     
     if (key == 'w' && wTriggered == false){
       player1Ship.targetLocation.add(new PVector(0, -10000));
@@ -266,6 +313,14 @@ void keyReleased() {
     }
     if (upTriggered == false && leftTriggered == false && downTriggered == false && rightTriggered == false){
       player2Ship.targetLocation = player2Ship.position.copy().add(player2Ship.velocity.copy());
+    }
+
+    if (key == '1'){
+      oneTriggered = false;
+    }
+
+    if (key == '2'){
+      twoTriggered = false;
     }
 }
 

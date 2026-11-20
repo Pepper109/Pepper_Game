@@ -1,5 +1,5 @@
 class Projectile{
-    float  maxVelocity, homingRate, acceleration, homingRange, lifetime;
+    float  maxVelocity, homingRate, acceleration, homingRange, lifetime, maxRotateRate;
     int type;
     boolean alive;
     PVector position, velocity, target;
@@ -9,8 +9,38 @@ class Projectile{
     //railgun ammunition costs more metals, has instant travel time, pierces shields
     //nukes cost uranium-235, are slow but explode 4 hex aoe destroying all tiles present
 
-    Projectile(PVector position, PVector target, float homingRate, PVector velocity,
+    float capFloat(float f, float cap){
+        if (abs(f) > cap){
+            if (f > cap){
+                return cap;
+            }
+            if (f< cap){
+                return -cap;
+            }
+        }
+        return f;
+    }
+
+    Projectile(PVector position, PVector target, float lifetime, Ship shipTarget){
+        this.position = position;
+        this.target = target;
+        this.lifetime = lifetime;
+        this.shipTarget = shipTarget;
+    }
+
+
+    //useless methods, they don't get run. it's just here to make the compiler happy
+    void display(){}
+    void targetShip(Ship ship){}
+    void moveTO(PVector target){}
+
+}
+
+class Missile extends Projectile{
+
+    Missile(PVector position, PVector target, float homingRate, PVector velocity,
      float maxVelocity, float acceleration, float homingRange, float lifetime, Ship shipTarget){
+        super(position, target, lifetime, shipTarget);
         this.position = position;
         this.target = target;
         this.homingRate = homingRate;
@@ -21,6 +51,7 @@ class Projectile{
         this.alive = true;
         this.lifetime = lifetime;
         this.shipTarget = shipTarget;
+        this.maxRotateRate = 0.13;
     }
 
     void display(){
@@ -31,6 +62,11 @@ class Projectile{
         image(missile, 0, 0, 20, 80);
         popMatrix();
         imageMode(CORNER);
+    }
+
+    
+    void targetShip(Ship ship){
+        moveTO(ship.position.copy());
     }
 
     void moveTO(PVector target){
@@ -49,6 +85,7 @@ class Projectile{
                 diffAngle = diffAngle-2*PI;
             }
             float rotateRate = (maxVelocity*2-velocity.mag())/maxVelocity*diffAngle*homingRate*homingRange*(float) Math.sqrt(homingRange)/(1+PVector.dist(position, target)*PVector.dist(position, target));
+            rotateRate = capFloat(rotateRate, maxRotateRate);
             if (abs(rotateRate) > abs(diffAngle)){
                 rotateRate = diffAngle;
             }
@@ -63,8 +100,30 @@ class Projectile{
         }
     }
 
-    void targetShip(Ship ship){
-        moveTO(ship.position.copy());
+}
+
+class Bullet extends Projectile{
+    Bullet(PVector position, PVector target, float lifetime, Ship shipTarget, PVector velocity){
+        super(position, target, lifetime, shipTarget);
+        this.velocity = velocity;
     }
 
+    void moveTO(PVector target){
+        if (PVector.dist(position, target) >= velocity.mag()){
+            position = position.add(velocity);
+        }
+        if (PVector.dist(position, target)< velocity.mag()){
+            position = target;
+        }
+    }
+
+    void display(){
+        pushMatrix();
+        imageMode(CENTER);
+        translate(position.x, position.y);
+        rotate(PI/2+atan2(velocity.y, velocity.x));
+        image(missile, 0, 0, 20, 80);
+        popMatrix();
+        imageMode(CORNER);
+    }
 }

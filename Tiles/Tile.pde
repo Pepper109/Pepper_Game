@@ -20,6 +20,20 @@ this.id = (gridX+gridY)*(gridX+gridY+1)/2 + gridY;
 this.modifier = 0;
 }
 
+public List<Tile> getTaxiNeighbours(Tile t, int a){
+    List<Tile> neighbours = new ArrayList<Tile>();
+    for (int i=t.gridX-a;i <= t.gridX+a; i++){
+        for (int j= gridY-a;  j<= gridY+a; j++){
+            if (i < 0 || j < 0 || i >= tileXCount || j >= tileYCount) continue;
+            Tile c = tiles.get(getKey(i,j));
+            if (getTaxiDistance(c.gridX, c.gridY, t.gridX, t.gridY) <= a){
+                neighbours.add(c);
+            }
+        }
+    }
+    return neighbours;
+}
+
 int getAliveNeighboursCount(){
 int aliveNeighboursCount = 0;
     for (int i=gridX-1;i <= gridX+1; i++){
@@ -47,8 +61,9 @@ void updateAlive(){
 
 void display(){
     Ship s = getPlayer1Ship();
+    Ship t = player2Ship;
     boolean displayed = false;
-    if (visibility.get(s) == 2){
+    if (visibility.get(s) == 2 || visibility.get(t) ==  2){
         if (tileType == 0){
             image(energy, gridX*tileSize, gridY*tileSize, tileSize, tileSize);
         }
@@ -64,10 +79,13 @@ void display(){
         if (modifier == 1){
             image(mining, gridX*tileSize, gridY*tileSize, tileSize, tileSize);
         }
+        if (modifier == 2){
+            image(mining, gridX*tileSize, gridY*tileSize, tileSize, tileSize);
+        } // change to different colour mining tile.
         displayed = true;
         //rect(gridX*tileSize, gridY*tileSize, tileSize, tileSize);
     }
-    if (visibility.get(s) == 1){
+    if (displayed == false && (visibility.get(s) == 1 || visibility.get(t)== 1)){
         stroke(0);
         fill(100,100,100);
         rect(gridX*tileSize, gridY*tileSize, tileSize, tileSize);
